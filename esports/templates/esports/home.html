@@ -1,0 +1,97 @@
+{% extends 'esports/base.html' %}
+{% load static %}
+{% block title %}Predict — VCT Match Predictor{% endblock %}
+
+{% block content %}
+
+<!-- ── HERO ─────────────────────────────────────────────── -->
+<section class="hero">
+  <p class="hero-eyebrow">VCT 2021 – 2026 &nbsp;·&nbsp; Machine Learning</p>
+  <h1>Predict the Outcome of Any<br><span>Professional Valorant Match</span></h1>
+  <p class="hero-sub">
+    Ensemble of Logistic Regression, Random Forest and XGBoost trained on
+    12,000+ VCT matches using rolling pre-match player statistics.
+  </p>
+</section>
+
+<!-- ── PREDICT FORM ──────────────────────────────────────── -->
+<section class="predict-section">
+  <div class="predict-form">
+
+    {% if not models_ready %}
+    <div class="error-box" style="margin-bottom:16px">
+      Models are not loaded. Run <code>python -m ml.train</code> first, then restart the server.
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <p class="card-title">Select Teams</p>
+      <form id="predict-form" autocomplete="off">
+        {% csrf_token %}
+        <div class="teams-row">
+          <div class="team-select-group">
+            <label for="team-a">Team A</label>
+            <select id="team-a" name="team_a" class="team-select" {% if not models_ready %}disabled{% endif %}>
+              <option value="">— Choose Team —</option>
+              {% for team in teams %}<option value="{{ team }}">{{ team }}</option>{% endfor %}
+            </select>
+          </div>
+
+          <div class="vs-badge">VS</div>
+
+          <div class="team-select-group">
+            <label for="team-b">Team B</label>
+            <select id="team-b" name="team_b" class="team-select" {% if not models_ready %}disabled{% endif %}>
+              <option value="">— Choose Team —</option>
+              {% for team in teams %}<option value="{{ team }}">{{ team }}</option>{% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" id="predict-btn" class="predict-btn" {% if not models_ready %}disabled{% endif %}>
+          Predict Match
+        </button>
+      </form>
+    </div><!-- .card -->
+
+  </div><!-- .predict-form -->
+
+  <!-- Results injected here by predict.js -->
+  <div id="results" class="hidden mt-16"></div>
+
+</section>
+
+<!-- ── HOW IT WORKS ──────────────────────────────────────── -->
+<section class="how-section">
+  <div class="container">
+    <p class="card-title" style="text-align:center;margin-bottom:32px">How It Works</p>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-icon">01</div>
+        <h3>Rolling History</h3>
+        <p>For each match, we compute every player's career average stats from all <em>prior</em> matches — zero leakage from the game being predicted.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">02</div>
+        <h3>Team Features</h3>
+        <p>Player stats (ACS, KD, KAST, ADR, FK, FD, HS%, Rating) are aggregated per team — mean, peak, and consistency — then differenced (Team A − Team B).</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">03</div>
+        <h3>Ensemble Prediction</h3>
+        <p>Three models vote: Logistic Regression, Random Forest, and XGBoost. The ensemble average probability is the final prediction.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon">04</div>
+        <h3>Time-Based Split</h3>
+        <p>Trained on 2021–2023, validated on 2024, tested on 2025–2026. Prevents future information leaking into training.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'esports/js/predict.js' %}"></script>
+{% endblock %}
