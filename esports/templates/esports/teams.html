@@ -1,0 +1,58 @@
+{% extends 'esports/base.html' %}
+{% load static %}
+{% block title %}Teams — VCT Match Predictor{% endblock %}
+
+{% block content %}
+
+<section class="page-header container">
+  <p class="hero-eyebrow">Dataset</p>
+  <h1 class="page-title">Known <span>Teams</span></h1>
+  <p class="page-sub">
+    {{ teams|length }} teams found in the VCT 2021–2026 dataset.
+    Click any team to pre-fill it in the predictor.
+  </p>
+</section>
+
+<section class="teams-section container">
+  <input
+    id="team-search"
+    class="search-box"
+    type="text"
+    placeholder="Search teams..."
+    autocomplete="off"
+  >
+
+  <div class="teams-grid" id="teams-grid">
+    {% for team in teams %}
+    <a href="/?team_a={{ team|urlencode }}" class="team-card" data-name="{{ team|lower }}">
+      <div class="team-card-name">{{ team }}</div>
+      <div class="team-card-action">Click to predict &rarr;</div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <p id="no-results" class="hidden" style="color:var(--text-muted);margin-top:24px">
+    No teams match your search.
+  </p>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const search = document.getElementById('team-search');
+  const cards  = document.querySelectorAll('.team-card');
+  const none   = document.getElementById('no-results');
+
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim();
+    let visible = 0;
+    cards.forEach(c => {
+      const match = c.dataset.name.includes(q);
+      c.classList.toggle('team-hidden', !match);
+      if (match) visible++;
+    });
+    none.classList.toggle('hidden', visible > 0);
+  });
+</script>
+{% endblock %}
