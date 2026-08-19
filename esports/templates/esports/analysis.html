@@ -1,0 +1,167 @@
+{% extends 'esports/base.html' %}
+{% load static %}
+{% block title %}Model Analysis — VCT Match Predictor{% endblock %}
+
+{% block content %}
+
+<section class="page-header container">
+  <p class="hero-eyebrow">Machine Learning</p>
+  <h1 class="page-title">Model <span>Analysis</span></h1>
+  <p class="page-sub">
+    Performance metrics and diagnostic plots for the three models and their
+    ensemble, evaluated on the held-out test set (VCT 2025–2026{% if test_count %},
+    {{ test_count }} matches{% endif %}).
+  </p>
+</section>
+
+<section class="analysis-section container">
+
+  {% if not models_ready %}
+  <div class="error-box section-gap">
+    Models are not loaded, so metrics cannot be computed.
+    Run <code>python -m ml.train</code>, then restart the server.
+    The plots below are from the last completed training run.
+  </div>
+  {% endif %}
+
+  <!-- ── DATASET STATS ──────────────────────────────────── -->
+  {% if total_count %}
+  <div class="card section-gap">
+    <p class="card-title">Dataset Overview</p>
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-number">{{ total_count|floatformat:"0" }}</div>
+        <div class="stat-label">Total Matches</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">{{ train_count|floatformat:"0" }}</div>
+        <div class="stat-label">Training (2021–23)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">{{ val_count|floatformat:"0" }}</div>
+        <div class="stat-label">Validation (2024)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">{{ test_count|floatformat:"0" }}</div>
+        <div class="stat-label">Test (2025–26)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">{{ feature_count }}</div>
+        <div class="stat-label">Features</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">{{ model_count }}</div>
+        <div class="stat-label">Models</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── METRICS TABLE ──────────────────────────────────── -->
+  {% if metrics %}
+  <div class="card section-gap">
+    <p class="card-title">Test-Set Performance (VCT 2025–2026)</p>
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Accuracy</th>
+          <th>ROC-AUC</th>
+          <th>F1</th>
+          <th>Log-Loss</th>
+          <th>Brier Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in metrics %}
+        <tr {% if row.ensemble %}class="ensemble-row"{% endif %}>
+          <td class="model-col">{{ row.name }}</td>
+          <td><span class="metric-val {% if row.accuracy_best %}metric-best{% endif %}">{{ row.accuracy }}</span></td>
+          <td><span class="metric-val {% if row.auc_best %}metric-best{% endif %}">{{ row.auc }}</span></td>
+          <td><span class="metric-val {% if row.f1_best %}metric-best{% endif %}">{{ row.f1 }}</span></td>
+          <td><span class="metric-val {% if row.logloss_best %}metric-best{% endif %}">{{ row.logloss }}</span></td>
+          <td><span class="metric-val {% if row.brier_best %}metric-best{% endif %}">{{ row.brier }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:12px">
+      Higher is better for Accuracy, ROC-AUC and F1. Lower is better for Log-Loss and Brier Score.
+      Best value per column is highlighted. ROC-AUC is the primary metric — it measures
+      ranking quality independent of threshold.
+      <br>
+      The <strong>ensemble</strong> row is the mean of the three model probabilities and is what
+      the predictor actually reports.
+      {% if baseline_acc %}
+      A majority-class baseline (always pick Team&nbsp;A) scores {{ baseline_acc }} accuracy on this
+      test set, so accuracy alone overstates how much the models know — ROC-AUC and Brier Score
+      are the honest comparisons.
+      {% endif %}
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- ── ROC + CALIBRATION ──────────────────────────────── -->
+  <div class="plots-grid section-gap">
+    <div class="card plot-card">
+      <p class="plot-title">ROC Curves</p>
+      <img src="{% static 'plots/roc_curves.png' %}" alt="ROC Curves for all three models">
+      <p class="plot-caption">The diagonal dashed line represents a random classifier (AUC=0.5). All three models sit above it, confirming genuine predictive signal beyond chance.</p>
+    </div>
+    <div class="card plot-card">
+      <p class="plot-title">Calibration Plot</p>
+      <img src="{% static 'plots/calibration.png' %}" alt="Calibration / reliability diagram">
+      <p class="plot-caption">A perfectly calibrated model would follow the diagonal. Random Forest tracks closest, meaning its predicted probabilities best reflect true win rates.</p>
+    </div>
+  </div>
+
+  <!-- ── SHAP ───────────────────────────────────────────── -->
+  <div class="card plot-card section-gap">
+    <p class="plot-title">SHAP Feature Impact — XGBoost (Test Set)</p>
+    <img src="{% static 'plots/shap_summary.png' %}" alt="SHAP beeswarm summary plot" style="max-width:720px;margin:0 auto;display:block">
+    <p class="plot-caption">Each dot is one match. Red = high feature value, blue = low. Dots to the right of 0 pushed the model toward predicting Team A wins; left pushed toward Team B. ACS differential and KD differential are the strongest drivers.</p>
+  </div>
+
+  <!-- ── FEATURE IMPORTANCE GRID ───────────────────────── -->
+  <div class="plots-grid section-gap">
+    <div class="card plot-card">
+      <p class="plot-title">Random Forest — Feature Importance</p>
+      <img src="{% static 'plots/rf_importance.png' %}" alt="Random Forest feature importance">
+    </div>
+    <div class="card plot-card">
+      <p class="plot-title">XGBoost — Feature Importance</p>
+      <img src="{% static 'plots/xgb_importance.png' %}" alt="XGBoost feature importance">
+    </div>
+  </div>
+
+  <div class="card plot-card section-gap">
+    <p class="plot-title">Logistic Regression — Absolute Coefficients</p>
+    <img src="{% static 'plots/lr_coef.png' %}" alt="Logistic Regression coefficients" style="max-width:720px;margin:0 auto;display:block">
+    <p class="plot-caption">Larger absolute coefficient = stronger influence on the log-odds. The regularisation (C=0.1) penalises very large coefficients, keeping probabilities well-behaved.</p>
+  </div>
+
+  <!-- ── FEATURE DESCRIPTIONS ──────────────────────────── -->
+  <div class="card section-gap">
+    <p class="card-title">Feature Descriptions</p>
+    <table class="metrics-table">
+      <thead>
+        <tr><th>Feature</th><th>Description</th><th>Direction</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="model-col">delta_ACS</td><td>Average Combat Score differential — composite of kills + damage</td><td><span class="badge-good">Higher = better</span></td></tr>
+        <tr><td class="model-col">delta_KD</td><td>Kill/Death ratio differential</td><td><span class="badge-good">Higher = better</span></td></tr>
+        <tr><td class="model-col">delta_KAST</td><td>% rounds with a Kill, Assist, Trade or Survive</td><td><span class="badge-good">Higher = better</span></td></tr>
+        <tr><td class="model-col">delta_ADR</td><td>Average Damage Per Round differential</td><td><span class="badge-good">Higher = better</span></td></tr>
+        <tr><td class="model-col">delta_FK</td><td>First kills per map differential — opening duel impact</td><td><span class="badge-good">Higher = better</span></td></tr>
+        <tr><td class="model-col">delta_FD</td><td>First deaths per map differential — dying on opening duel</td><td><span class="badge-bad">Lower = better</span></td></tr>
+        <tr><td class="model-col">delta_HS</td><td>Headshot percentage differential — aim precision proxy</td><td><span class="badge-good">Higher = better</span></td></tr>
+        <tr><td class="model-col">delta_rating</td><td>VLR composite rating differential</td><td><span class="badge-good">Higher = better</span></td></tr>
+        <tr><td class="model-col">delta_consistency</td><td>Std dev of team ACS differential — roster depth vs star-heavy</td><td><span class="badge-bad">Lower = more consistent</span></td></tr>
+        <tr><td class="model-col">delta_peak</td><td>Top-fragger ACS differential — best player on each team</td><td><span class="badge-good">Higher = better</span></td></tr>
+        <tr><td class="model-col">delta_experience</td><td>Average maps played differential — career experience</td><td><span class="badge-good">Higher = better</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
+{% endblock %}
