@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}VCT Match Predictor{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'esports/css/style.css' %}">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="{% url 'home' %}" class="nav-logo">
+        <svg class="logo-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="2" fill="#FF4655"/>
+          <path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="#FF4655" stroke-width="2" stroke-linecap="round"/>
+          <path d="M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8" stroke="#FF4655" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        VCT PREDICTOR
+      </a>
+      <div class="nav-links">
+        <a href="{% url 'home' %}"     class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Predict</a>
+        <a href="{% url 'analysis' %}" class="nav-link {% if request.resolver_match.url_name == 'analysis' %}active{% endif %}">Analysis</a>
+        <a href="{% url 'teams' %}"    class="nav-link {% if request.resolver_match.url_name == 'teams' %}active{% endif %}">Teams</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>{% block content %}{% endblock %}</main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>VCT Match Predictor &bull; Thesis Project &bull; Data: VLR.gg VCT 2021–2026</p>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>
