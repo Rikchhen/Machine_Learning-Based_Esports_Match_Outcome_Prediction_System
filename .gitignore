@@ -1,0 +1,26 @@
+# Virtual environment
+pred_env/
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Django
+db.sqlite3
+staticfiles/
+*.log
+
+# Raw dataset (not redistributed - see README)
+Valorantdata/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
