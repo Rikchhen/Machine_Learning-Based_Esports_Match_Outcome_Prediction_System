@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'esports/css/style.css' %}">
+  <script>document.documentElement.className += ' js';</script>
+  <link rel="stylesheet" href="{% static 'esports/css/style.css' %}?v=5">
 </head>
 <body>
 
@@ -38,6 +39,7 @@
     </div>
   </footer>
 
+  <script src="{% static 'esports/js/ui.js' %}?v=3"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

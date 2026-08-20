@@ -26,7 +26,7 @@
 
   <!-- ── DATASET STATS ──────────────────────────────────── -->
   {% if total_count %}
-  <div class="card section-gap">
+  <div class="card section-gap reveal">
     <p class="card-title">Dataset Overview</p>
     <div class="stat-row">
       <div class="stat-box">
@@ -59,9 +59,9 @@
 
   <!-- ── METRICS TABLE ──────────────────────────────────── -->
   {% if metrics %}
-  <div class="card section-gap">
+  <div class="card section-gap reveal">
     <p class="card-title">Test-Set Performance (VCT 2025–2026)</p>
-    <table class="metrics-table">
+    <div class="table-wrap"><table class="metrics-table">
       <thead>
         <tr>
           <th>Model</th>
@@ -84,7 +84,7 @@
         </tr>
         {% endfor %}
       </tbody>
-    </table>
+    </table></div>
     <p style="font-size:12px;color:var(--text-muted);margin-top:12px">
       Higher is better for Accuracy, ROC-AUC and F1. Lower is better for Log-Loss and Brier Score.
       Best value per column is highlighted. ROC-AUC is the primary metric — it measures
@@ -102,7 +102,7 @@
   {% endif %}
 
   <!-- ── ROC + CALIBRATION ──────────────────────────────── -->
-  <div class="plots-grid section-gap">
+  <div class="plots-grid section-gap reveal stagger">
     <div class="card plot-card">
       <p class="plot-title">ROC Curves</p>
       <img src="{% static 'plots/roc_curves.png' %}" alt="ROC Curves for all three models">
@@ -116,14 +116,14 @@
   </div>
 
   <!-- ── SHAP ───────────────────────────────────────────── -->
-  <div class="card plot-card section-gap">
+  <div class="card plot-card section-gap reveal">
     <p class="plot-title">SHAP Feature Impact — XGBoost (Test Set)</p>
-    <img src="{% static 'plots/shap_summary.png' %}" alt="SHAP beeswarm summary plot" style="max-width:720px;margin:0 auto;display:block">
+    <img src="{% static 'plots/shap_summary.png' %}" alt="SHAP beeswarm summary plot" style="max-width:min(720px,100%);margin:0 auto;display:block">
     <p class="plot-caption">Each dot is one match. Red = high feature value, blue = low. Dots to the right of 0 pushed the model toward predicting Team A wins; left pushed toward Team B. ACS differential and KD differential are the strongest drivers.</p>
   </div>
 
   <!-- ── FEATURE IMPORTANCE GRID ───────────────────────── -->
-  <div class="plots-grid section-gap">
+  <div class="plots-grid section-gap reveal stagger">
     <div class="card plot-card">
       <p class="plot-title">Random Forest — Feature Importance</p>
       <img src="{% static 'plots/rf_importance.png' %}" alt="Random Forest feature importance">
@@ -134,14 +134,14 @@
     </div>
   </div>
 
-  <div class="card plot-card section-gap">
+  <div class="card plot-card section-gap reveal">
     <p class="plot-title">Logistic Regression — Absolute Coefficients</p>
-    <img src="{% static 'plots/lr_coef.png' %}" alt="Logistic Regression coefficients" style="max-width:720px;margin:0 auto;display:block">
+    <img src="{% static 'plots/lr_coef.png' %}" alt="Logistic Regression coefficients" style="max-width:min(720px,100%);margin:0 auto;display:block">
     <p class="plot-caption">Larger absolute coefficient = stronger influence on the log-odds. The regularisation (C=0.1) penalises very large coefficients, keeping probabilities well-behaved.</p>
   </div>
 
   <!-- ── FEATURE DESCRIPTIONS ──────────────────────────── -->
-  <div class="card section-gap">
+  <div class="card section-gap reveal">
     <p class="card-title">Feature Descriptions</p>
     <table class="metrics-table">
       <thead>

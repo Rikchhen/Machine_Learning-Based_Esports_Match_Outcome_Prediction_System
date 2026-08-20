@@ -6,12 +6,25 @@
 
 <!-- ── HERO ─────────────────────────────────────────────── -->
 <section class="hero">
-  <p class="hero-eyebrow">VCT 2021 – 2026 &nbsp;·&nbsp; Machine Learning</p>
-  <h1>Predict the Outcome of Any<br><span>Professional Valorant Match</span></h1>
-  <p class="hero-sub">
-    Ensemble of Logistic Regression, Random Forest and XGBoost trained on
-    12,000+ VCT matches using rolling pre-match player statistics.
-  </p>
+  <div class="hero-glow hero-glow-a" aria-hidden="true"></div>
+  <div class="hero-glow hero-glow-b" aria-hidden="true"></div>
+  <div class="hero-grid" aria-hidden="true"></div>
+
+  <div class="hero-inner">
+    <p class="hero-eyebrow"><span class="hero-dot" aria-hidden="true"></span>VCT 2021 – 2026 &nbsp;·&nbsp; Machine Learning</p>
+    <h1>Predict the Outcome of Any<br><span>Professional Valorant Match</span></h1>
+    <p class="hero-sub">
+      An ensemble of Logistic Regression, Random Forest and XGBoost, trained on
+      12,000+ VCT matches using leakage-safe pre-match player statistics.
+    </p>
+
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="hero-stat-num">12,558</span><span class="hero-stat-label">Matches</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">3</span><span class="hero-stat-label">ML Models</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">0.62</span><span class="hero-stat-label">ROC-AUC</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">11</span><span class="hero-stat-label">Features</span></div>
+    </div>
+  </div>
 </section>
 
 <!-- ── PREDICT FORM ──────────────────────────────────────── -->
@@ -24,35 +37,38 @@
     </div>
     {% endif %}
 
-    <div class="card">
-      <p class="card-title">Select Teams</p>
-      <form id="predict-form" autocomplete="off">
-        {% csrf_token %}
-        <div class="teams-row">
-          <div class="team-select-group">
-            <label for="team-a">Team A</label>
-            <select id="team-a" name="team_a" class="team-select" {% if not models_ready %}disabled{% endif %}>
-              <option value="">— Choose Team —</option>
-              {% for team in teams %}<option value="{{ team }}">{{ team }}</option>{% endfor %}
-            </select>
+    <div class="predict-shell reveal">
+      <div class="card predict-card">
+        <p class="card-title">Select Teams</p>
+        <p class="predict-hint">Choose two teams to see each model's vote, an ensemble win probability, and a full stat breakdown.</p>
+        <form id="predict-form" autocomplete="off">
+          {% csrf_token %}
+          <div class="teams-row">
+            <div class="team-select-group">
+              <label for="team-a"><span class="dot-a" aria-hidden="true"></span>Team A</label>
+              <select id="team-a" name="team_a" class="team-select" {% if not models_ready %}disabled{% endif %}>
+                <option value="">— Choose Team —</option>
+                {% for team in teams %}<option value="{{ team }}">{{ team }}</option>{% endfor %}
+              </select>
+            </div>
+
+            <div class="vs-badge" aria-hidden="true">VS</div>
+
+            <div class="team-select-group">
+              <label for="team-b"><span class="dot-b" aria-hidden="true"></span>Team B</label>
+              <select id="team-b" name="team_b" class="team-select" {% if not models_ready %}disabled{% endif %}>
+                <option value="">— Choose Team —</option>
+                {% for team in teams %}<option value="{{ team }}">{{ team }}</option>{% endfor %}
+              </select>
+            </div>
           </div>
 
-          <div class="vs-badge">VS</div>
-
-          <div class="team-select-group">
-            <label for="team-b">Team B</label>
-            <select id="team-b" name="team_b" class="team-select" {% if not models_ready %}disabled{% endif %}>
-              <option value="">— Choose Team —</option>
-              {% for team in teams %}<option value="{{ team }}">{{ team }}</option>{% endfor %}
-            </select>
-          </div>
-        </div>
-
-        <button type="submit" id="predict-btn" class="predict-btn" {% if not models_ready %}disabled{% endif %}>
-          Predict Match
-        </button>
-      </form>
-    </div><!-- .card -->
+          <button type="submit" id="predict-btn" class="predict-btn" {% if not models_ready %}disabled{% endif %}>
+            Predict Match
+          </button>
+        </form>
+      </div><!-- .card -->
+    </div><!-- .predict-shell -->
 
   </div><!-- .predict-form -->
 
@@ -64,27 +80,48 @@
 <!-- ── HOW IT WORKS ──────────────────────────────────────── -->
 <section class="how-section">
   <div class="container">
-    <p class="card-title" style="text-align:center;margin-bottom:32px">How It Works</p>
-    <div class="how-grid">
+    <p class="card-title" style="text-align:center;margin-bottom:8px">How It Works</p>
+    <p class="how-sub">From raw player stats to an explainable, leakage-safe prediction in four steps.</p>
+    <div class="how-grid reveal stagger">
       <div class="how-card">
-        <div class="how-icon">01</div>
+        <div class="how-head">
+          <span class="how-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>
+          </span>
+          <span class="how-num">01</span>
+        </div>
         <h3>Rolling History</h3>
-        <p>For each match, we compute every player's career average stats from all <em>prior</em> matches — zero leakage from the game being predicted.</p>
+        <p>For each match, we compute every player's career average stats from all <em>prior</em> matches, with zero leakage from the game being predicted.</p>
       </div>
       <div class="how-card">
-        <div class="how-icon">02</div>
+        <div class="how-head">
+          <span class="how-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>
+          </span>
+          <span class="how-num">02</span>
+        </div>
         <h3>Team Features</h3>
-        <p>Player stats (ACS, KD, KAST, ADR, FK, FD, HS%, Rating) are aggregated per team — mean, peak, and consistency — then differenced (Team A − Team B).</p>
+        <p>Player stats (ACS, KD, KAST, ADR, FK, FD, HS%, Rating) are aggregated per team — mean, peak, consistency — then differenced (Team A − Team B).</p>
       </div>
       <div class="how-card">
-        <div class="how-icon">03</div>
+        <div class="how-head">
+          <span class="how-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="12" r="2.5"/><path d="M8.2 7.2 15.6 11M8.2 16.8 15.6 13"/></svg>
+          </span>
+          <span class="how-num">03</span>
+        </div>
         <h3>Ensemble Prediction</h3>
-        <p>Three models vote: Logistic Regression, Random Forest, and XGBoost. The ensemble average probability is the final prediction.</p>
+        <p>Three models vote: Logistic Regression, Random Forest, and XGBoost. The average of their probabilities is the final prediction.</p>
       </div>
       <div class="how-card">
-        <div class="how-icon">04</div>
+        <div class="how-head">
+          <span class="how-svg" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M12 10v11"/></svg>
+          </span>
+          <span class="how-num">04</span>
+        </div>
         <h3>Time-Based Split</h3>
-        <p>Trained on 2021–2023, validated on 2024, tested on 2025–2026. Prevents future information leaking into training.</p>
+        <p>Trained on 2021–2023, validated on 2024, tested on 2025–2026, so future information never leaks into training.</p>
       </div>
     </div>
   </div>

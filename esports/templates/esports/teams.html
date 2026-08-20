@@ -16,13 +16,13 @@
 <section class="teams-section container">
   <input
     id="team-search"
-    class="search-box"
+    class="search-box reveal"
     type="text"
     placeholder="Search teams..."
     autocomplete="off"
   >
 
-  <div class="teams-grid" id="teams-grid">
+  <div class="teams-grid reveal" id="teams-grid">
     {% for team in teams %}
     <a href="/?team_a={{ team|urlencode }}" class="team-card" data-name="{{ team|lower }}">
       <div class="team-card-name">{{ team }}</div>
